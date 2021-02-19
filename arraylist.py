@@ -60,10 +60,53 @@ class ArrayList:
 
         # list is not empty
         iterator = iter(self)
+        str_rep = '['
+        count = 0
 
-    # todo implement
+        # iterator loop
+        while True:
+            try:
+                # append next item to string
+                str_rep += str(next(iterator))
+
+                # fence post case
+                if count < len(self) - 1:
+                    str_rep += ', '
+
+                count += 1
+            except StopIteration:
+                str_rep += ']'
+                break
+
+        return str_rep
+
     def __repr__(self):
         """Supports REPL inspection. (Same behavior as `str`.)"""
+        # list is empty
+        if len(self) == 0:
+            return '[]'
+
+        # list is not empty
+        iterator = iter(self)
+        str_rep = '['
+        count = 0
+
+        # iterator loop
+        while True:
+            try:
+                # append next item to string
+                str_rep += str(next(iterator))
+
+                # fence post case
+                if count < len(self) - 1:
+                    str_rep += ', '
+
+                count += 1
+            except StopIteration:
+                str_rep += ']'
+                break
+
+        return str_rep
 
     ### single-element manipulation ###
 
@@ -88,10 +131,15 @@ class ArrayList:
 
         return item
 
-    # todo implement
     def remove(self, value):
         """Removes the first (closest to the front) instance of value from the
         list. Raises a ValueError if value is not found in the list."""
+
+        # get index
+        idx = self.index(value)
+
+        # remove item
+        del self[idx]
 
     ### predicates (T/F queries) ###
 
