@@ -54,6 +54,13 @@ class ArrayList:
         and enclosed by square brackets. E.g., for a list containing values
         1, 2 and 3, returns '[1, 2, 3]'."""
 
+        # list is empty
+        if len(self) == 0:
+            return '[]'
+
+        # list is not empty
+        iterator = iter(self)
+
     # todo implement
     def __repr__(self):
         """Supports REPL inspection. (Same behavior as `str`.)"""
@@ -71,10 +78,15 @@ class ArrayList:
         list, as needed. Note that inserting a value at len(self) --- equivalent
         to appending the value --- is permitted. Raises IndexError if idx is invalid."""
 
-    # todo implement
     def pop(self, idx=-1):
         """Deletes and returns the element at idx (which is the last element,
         by default)."""
+
+        # get and delete item
+        item = self[idx]
+        del self[idx]
+
+        return item
 
     # todo implement
     def remove(self, value):
@@ -168,7 +180,7 @@ class ArrayList:
 
         # check if j is none
         if j is None:
-            j = len(self.data)
+            j = len(self)
 
         # iterate through list
         for idx in range(i, j):
