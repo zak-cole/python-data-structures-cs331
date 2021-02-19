@@ -263,12 +263,48 @@ class ArrayList:
         instance that contains the values in this list followed by those
         of other."""
 
+        # check that other is arraylist
+        if other is ArrayList:
+            # init new list
+            new_list = ArrayList()
+
+            # add items in self to new list
+            iterator = iter(self)
+            while True:
+                try:
+                    new_list.append(next(iterator))
+                except StopIteration:
+                    break
+
+            # add items in other list to new list
+            iterator = iter(other)
+            while True:
+                try:
+                    new_list.append(next(iterator))
+                except StopIteration:
+                    break
+
+            return new_list
+
     def clear(self):
         self.data = ConstrainedList()  # don't change this!
 
     def copy(self):
         """Returns a new ArrayList instance (with a separate data store), that
         contains the same values as this list."""
+
+        # init new list
+        new_list = ArrayList()
+
+        # add items in current list to new list
+        iterator = iter(self)
+        while True:
+            try:
+                new_list.append(next(iterator))
+            except StopIteration:
+                break
+
+        return new_list
 
     def extend(self, other):
         """Adds all elements, in order, from other --- an Iterable --- to this list."""
