@@ -47,66 +47,18 @@ class ArrayList:
 
     ### stringification ###
 
-    # todo implement
     def __str__(self):
         """Implements `str(self)`. Returns '[]' if the list is empty, else
         returns `str(x)` for all values `x` in this list, separated by commas
         and enclosed by square brackets. E.g., for a list containing values
         1, 2 and 3, returns '[1, 2, 3]'."""
 
-        # list is empty
-        if len(self) == 0:
-            return '[]'
-
-        # list is not empty
-        iterator = iter(self)
-        str_rep = '['
-        count = 0
-
-        # iterator loop
-        while True:
-            try:
-                # append next item to string
-                str_rep += str(next(iterator))
-
-                # fence post case
-                if count < len(self) - 1:
-                    str_rep += ', '
-
-                count += 1
-            except StopIteration:
-                str_rep += ']'
-                break
-
-        return str_rep
+        return '[' + ', '.join(str(x) for x in self) + ']'
 
     def __repr__(self):
         """Supports REPL inspection. (Same behavior as `str`.)"""
-        # list is empty
-        if len(self) == 0:
-            return '[]'
 
-        # list is not empty
-        iterator = iter(self)
-        str_rep = '['
-        count = 0
-
-        # iterator loop
-        while True:
-            try:
-                # append next item to string
-                str_rep += str(next(iterator))
-
-                # fence post case
-                if count < len(self) - 1:
-                    str_rep += ', '
-
-                count += 1
-            except StopIteration:
-                str_rep += ']'
-                break
-
-        return str_rep
+        return str(self)
 
     ### single-element manipulation ###
 
@@ -115,11 +67,25 @@ class ArrayList:
         self.data.append(None)
         self.data[len(self.data) - 1] = value
 
-    # todo implement
     def insert(self, idx, value):
         """Inserts value at position idx, shifting the original elements down the
         list, as needed. Note that inserting a value at len(self) --- equivalent
         to appending the value --- is permitted. Raises IndexError if idx is invalid."""
+        nidx = self._normalize_idx(idx)
+
+        # size check
+        if 0 > nidx > len(self)-1:
+            raise ValueError
+
+        # make list bigger
+        self.append(None)
+
+        # move other items in list
+        for i in range(len(self) - 1, nidx, -1):
+            self[i] = self[i - 1]
+
+        # insert new item
+        self[idx] = value
 
     def pop(self, idx=-1):
         """Deletes and returns the element at idx (which is the last element,
@@ -148,7 +114,11 @@ class ArrayList:
         other. If other is not an ArrayList, returns False."""
 
         # check if other is an ArrayList
-        if other is ArrayList:
+        if isinstance(other, ArrayList):
+            # make sure lengths are equal
+            if len(self) != len(other):
+                return False
+
             # iterate through values in list
             for idx in range(len(self.data)):
                 # items are not equal
@@ -230,8 +200,12 @@ class ArrayList:
         if j is None:
             j = len(self)
 
+        # normalize indices
+        ni = self._normalize_idx(i)
+        nj = self._normalize_idx(j)
+
         # iterate through list
-        for idx in range(i, j):
+        for idx in range(ni, nj):
             if self.data[idx] == value:
                 return idx
 
@@ -264,7 +238,7 @@ class ArrayList:
         of other."""
 
         # check that other is arraylist
-        if other is ArrayList:
+        if isinstance(other, ArrayList):
             # init new list
             new_list = ArrayList()
 
@@ -308,6 +282,8 @@ class ArrayList:
 
     def extend(self, other):
         """Adds all elements, in order, from other --- an Iterable --- to this list."""
+        for value in other:
+            self.append(value)
 
     ### iteration ###
 
