@@ -69,7 +69,6 @@ class LinkedList:
 
         node.val = value
 
-
     def __delitem__(self, idx):
         """Implements `del self[idx]`"""
         assert (isinstance(idx, int))
@@ -151,9 +150,24 @@ class LinkedList:
     def __eq__(self, other):
         """Returns True if this LinkedList contains the same elements (in order) as
         other. If other is not an LinkedList, returns False."""
+        if other is not LinkedList:  # check same time
+            return False
+        elif self.length != other.length:  # check same length
+            return False
+        else:  # iterate through list
+            for i in range(self.length):
+                if self[i] != other[i]:
+                    return False
+
+            return True
 
     def __contains__(self, value):
         """Implements `val in self`. Returns true if value is found in this list."""
+        for val in iter(self):  # iterate through list
+            if val == value:
+                return True
+
+        return False
 
     ### queries ###
 
@@ -189,6 +203,17 @@ class LinkedList:
         this list between index i (inclusive) and j (exclusive). If j is not
         specified, search through the end of the list for value. If value
         is not in the list, raise a ValueError."""
+        # check for j
+        if j is None:
+            j = self.length
+
+        # iterate through list
+        for idx in range(i, j):
+            if self[idx] == value:
+                return idx
+
+        # value not found, raise error
+        raise ValueError
 
     def count(self, value):
         """Returns the number of times value appears in this list."""
@@ -196,8 +221,8 @@ class LinkedList:
         count = 0
 
         # iterate through list
-        for i in iter(self):
-            if i == value:
+        for val in iter(self):
+            if val == value:
                 count += 1
 
         return count
@@ -210,16 +235,36 @@ class LinkedList:
         of other."""
         assert (isinstance(other, LinkedList))
 
+        # init new list
+        new_list = self.copy()
+
+        # iterate through other, append values
+        for val in iter(other):
+            new_list.append(val)
+
+        return new_list
+
     def clear(self):
         """Removes all elements from this list."""
-        self.head = None
+        self.head.next = self.head.prior = self.head
+        self.length = 0
 
     def copy(self):
         """Returns a new LinkedList instance (with separate Nodes), that
         contains the same values as this list."""
+        # init new list
+        new_list = LinkedList()
+
+        # iterate through current list
+        for val in iter(self):
+            new_list.append(val)
+
+        return new_list
 
     def extend(self, other):
         """Adds all elements, in order, from other --- an Iterable --- to this list."""
+        for val in iter(other):
+            self.append(val)
 
     ### iteration ###
 
