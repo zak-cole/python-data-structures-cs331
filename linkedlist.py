@@ -41,7 +41,7 @@ class LinkedList:
         nidx = self._normalize_idx(idx)
 
         # check length stuff
-        if nidx < 0 or nidx > self.length:
+        if nidx > self.length or self.length == 0:
             raise IndexError
 
         # iterate through nodes
@@ -73,8 +73,6 @@ class LinkedList:
         """Implements `del self[idx]`"""
         assert (isinstance(idx, int))
 
-        assert (isinstance(idx, int))
-
         # normalize index
         nidx = self._normalize_idx(idx)
 
@@ -90,32 +88,6 @@ class LinkedList:
         node.prior.next = node.next
         node.next.prior = node.prior
         self.length -= 1
-
-    ### cursor-based access ###
-
-    def cursor_get(self):
-        """retrieves the value at the current cursor position"""
-        assert self.cursor is not self.head
-
-    def cursor_set(self, idx):
-        """sets the cursor to the node at the provided index"""
-
-    def cursor_move(self, offset):
-        """moves the cursor forward or backward by the provided offset
-        (a positive or negative integer); note that it is possible to advance
-        the cursor by further than the length of the list, in which case the
-        cursor will just "wrap around" the list, skipping over the sentinel
-        node as needed"""
-        assert len(self) > 0
-
-    def cursor_insert(self, value):
-        """inserts a new value after the cursor and sets the cursor to the
-        new node"""
-
-    def cursor_delete(self):
-        """deletes the node the cursor refers to and sets the cursor to the
-        following node"""
-        assert self.cursor is not self.head and len(self) > 0
 
     ### stringification ###
 
@@ -136,21 +108,54 @@ class LinkedList:
         """Inserts value at position idx, shifting the original elements down the
         list, as needed. Note that inserting a value at len(self) --- equivalent
         to appending the value --- is permitted. Raises IndexError if idx is invalid."""
+        # normalize index
+        nidx = self._normalize_idx(idx)
+
+        # check length stuff
+        if nidx > self.length:
+            raise IndexError
+
+        node = self.head.next
+        for _ in range(nidx):
+            node = node.next
+
+        new_node = LinkedList.Node(value, node.prior, node)
+        node.prior.next = node.prior = new_node
+        self.length += 1
 
     def pop(self, idx=-1):
         """Deletes and returns the element at idx (which is the last element,
         by default)."""
+        # normalize index
+        nidx = self._normalize_idx(idx)
+
+        # remove value
+        val = self[nidx]
+        del self[idx]
+
+        return val
 
     def remove(self, value):
         """Removes the first (closest to the front) instance of value from the
         list. Raises a ValueError if value is not found in the list."""
+        node = self.head.next
+
+        # iterate through list
+        for idx in range(self.length):
+            if node.val == value:
+                self.pop(idx)
+                return
+            node = node.next
+
+        # element not found
+        raise ValueError
 
     ### predicates (T/F queries) ###
 
     def __eq__(self, other):
         """Returns True if this LinkedList contains the same elements (in order) as
         other. If other is not an LinkedList, returns False."""
-        if other is not LinkedList:  # check same time
+        if not isinstance(other, LinkedList):  # check same type
             return False
         elif self.length != other.length:  # check same length
             return False
@@ -178,7 +183,7 @@ class LinkedList:
     def min(self):
         """Returns the minimum value in this list."""
         # init min
-        min_val = self.head.val
+        min_val = self.head.next.val
 
         # iterate through list
         for i in iter(self):
@@ -189,11 +194,11 @@ class LinkedList:
 
     def max(self):
         """Returns the maximum value in this list."""
-        max_val = self.head.val
+        max_val = self.head.next.val
 
         # iterate through list
         for i in iter(self):
-            if i < max_val:
+            if i > max_val:
                 max_val = i
 
         return max_val
@@ -203,14 +208,21 @@ class LinkedList:
         this list between index i (inclusive) and j (exclusive). If j is not
         specified, search through the end of the list for value. If value
         is not in the list, raise a ValueError."""
+        i = self._normalize_idx(i)
         # check for j
         if j is None:
             j = self.length
+        j = self._normalize_idx(j)
+
+        node = self.head.next
+        for _ in range(i):
+            node = node.next
 
         # iterate through list
         for idx in range(i, j):
-            if self[idx] == value:
+            if value == node.val:
                 return idx
+            node = node.next
 
         # value not found, raise error
         raise ValueError
